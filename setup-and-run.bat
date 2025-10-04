@@ -5,25 +5,50 @@ echo ============================================
 echo.
 
 REM Check Python
-echo [STEP 1/4] Checking Python...
+echo [STEP 1/5] Checking Python...
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] Python is not installed!
+    echo [WARNING] Python is not installed!
+    echo [INFO] Downloading and installing Python 3.12 automatically...
+    echo [INFO] This may take 5-10 minutes, please wait...
     echo.
-    echo Please download and install Python from:
-    echo https://www.python.org/downloads/
+    
+    REM Download Python installer using PowerShell
+    powershell -Command "Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe' -OutFile '%TEMP%\python-installer.exe'"
+    
+    if not exist "%TEMP%\python-installer.exe" (
+        echo [ERROR] Failed to download Python installer
+        echo [INFO] Please download manually from: https://www.python.org/downloads/
+        echo.
+        pause
+        exit /b 1
+    )
+    
+    echo [INFO] Installing Python - this will take a few minutes...
+    "%TEMP%\python-installer.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
+    
+    REM Wait for installation to complete
+    echo [INFO] Waiting for installation to complete...
+    timeout /t 20 /nobreak >nul
+    
+    REM Delete installer
+    del "%TEMP%\python-installer.exe"
+    
+    echo [OK] Python installed successfully!
     echo.
-    echo Make sure to check "Add Python to PATH" during installation!
+    echo [IMPORTANT] Please CLOSE this window and run setup-and-run.bat again
+    echo [IMPORTANT] This is needed to refresh the PATH environment variable
     echo.
     pause
-    exit /b 1
+    exit /b 0
 )
+
 echo [OK] Python is installed
 python --version
 echo.
 
 REM Install dependencies
-echo [STEP 2/4] Installing dependencies...
+echo [STEP 2/5] Installing dependencies...
 cd backend
 python -m pip install --upgrade pip --quiet
 python -m pip install Flask Flask-CORS Pillow watchdog requests --upgrade
@@ -36,7 +61,7 @@ echo [OK] All dependencies installed
 echo.
 
 REM Check ngrok
-echo [STEP 3/4] Checking ngrok...
+echo [STEP 3/5] Checking ngrok...
 where ngrok >nul 2>&1
 if errorlevel 1 (
     echo [WARNING] ngrok is not installed
@@ -55,7 +80,7 @@ if errorlevel 1 (
 echo.
 
 REM Create storage
-echo [STEP 4/4] Setting up storage...
+echo [STEP 4/5] Setting up storage...
 if not exist "C:\Users\%USERNAME%\MyCloud\Photos" mkdir "C:\Users\%USERNAME%\MyCloud\Photos"
 echo [OK] Storage ready: C:\Users\%USERNAME%\MyCloud\Photos
 echo.
@@ -63,8 +88,9 @@ echo.
 REM Initialize database
 python -c "from database import Database; db = Database(); print('[OK] Database initialized')" 2>nul
 
+echo [STEP 5/5] Starting Backend Server...
 echo ============================================
-echo Starting Backend Server...
+echo Backend Server Starting...
 echo ============================================
 echo.
 echo Local access: http://localhost:5000
