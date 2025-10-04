@@ -4,7 +4,7 @@ Client Configuration
 import os
 
 # Server settings
-SERVER_URL = 'https://nonteachable-extravertive-allegra.ngrok-free.dev'  # Change to your server IP if remote
+SERVER_URL = 'http://0.0.0.0:5000'  # Change to your server IP if remote
 
 # Authentication (if enabled on server)
 AUTH_TOKEN = 'your-secret-token-here'  # Must match server token
