@@ -14,18 +14,12 @@ import config
 from database import Database
 
 app = Flask(__name__)
-# Enable CORS for frontend access (localhost + Vercel)
-CORS(app, resources={
-    r"/*": {
-        "origins": [
-            "http://localhost:3000",
-            "https://*.vercel.app",
-            "https://vercel.app"
-        ],
-        "methods": ["GET", "POST", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
-    }
-})
+# Enable CORS for frontend access (localhost + Vercel + ngrok)
+CORS(app, 
+     origins=["*"],
+     methods=["GET", "POST", "DELETE", "OPTIONS", "PUT"],
+     allow_headers=["Content-Type", "Authorization"],
+     supports_credentials=False)
 
 # Initialize database
 db = Database()
@@ -103,7 +97,8 @@ def index():
     })
 
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['POST', 'OPTIONS'])
+@app.route('/api/upload', methods=['POST', 'OPTIONS'])
 def upload_file():
     """
     Upload a file
@@ -114,6 +109,14 @@ def upload_file():
     Returns:
         JSON with file ID and metadata
     """
+    # Handle preflight OPTIONS request
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    print(f"[UPLOAD] Received POST request from {request.remote_addr}")
+    print(f"[UPLOAD] Content-Type: {request.content_type}")
+    print(f"[UPLOAD] Files in request: {list(request.files.keys())}")
+    
     # Check authentication if enabled
     if config.REQUIRE_AUTH:
         token = request.headers.get('Authorization')
@@ -122,6 +125,7 @@ def upload_file():
     
     # Check if file is in request
     if 'file' not in request.files:
+        print(f"[UPLOAD ERROR] No 'file' in request.files")
         return jsonify({'error': 'No file provided'}), 400
     
     file = request.files['file']
@@ -206,6 +210,7 @@ def upload_file():
 
 
 @app.route('/files', methods=['GET'])
+@app.route('/api/files', methods=['GET'])
 def list_files():
     """
     List all files with optional pagination and filtering
@@ -232,6 +237,7 @@ def list_files():
 
 
 @app.route('/file/<int:file_id>', methods=['GET'])
+@app.route('/api/file/<int:file_id>', methods=['GET'])
 def download_file(file_id):
     """Download file by ID"""
     try:
@@ -256,6 +262,7 @@ def download_file(file_id):
 
 
 @app.route('/thumbnail/<int:file_id>', methods=['GET'])
+@app.route('/api/thumbnail/<int:file_id>', methods=['GET'])
 def get_thumbnail(file_id):
     """Get thumbnail for file"""
     try:
@@ -314,6 +321,7 @@ def delete_file(file_id):
 
 
 @app.route('/stats', methods=['GET'])
+@app.route('/api/stats', methods=['GET'])
 def get_stats():
     """Get storage statistics"""
     try:
@@ -330,6 +338,7 @@ def get_stats():
 
 
 @app.route('/search', methods=['GET'])
+@app.route('/api/search', methods=['GET'])
 def search_files():
     """Search files by filename"""
     try:
