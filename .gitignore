@@ -1,0 +1,15 @@
+# Create a simple .gitignore file
+node_modules/
+__pycache__/
+*.pyc
+*.db
+uploaded_files.log
+.env
+build/
+dist/
+*.log
+
+# Storage folders (don't commit uploaded files)
+storage/
+MyCloud/
+.thumbnails/
