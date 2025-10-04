@@ -1,0 +1,29 @@
+===========================================
+  PERSONAL CLOUD STORAGE - QUICK START
+===========================================
+
+📦 SETUP (First Time):
+   Just run: setup-and-run.bat
+
+✅ What it does automatically:
+   1. Checks Python (installs if missing)
+   2. Installs all dependencies (latest)
+   3. Checks ngrok (installs if missing)
+   4. Creates storage folder
+   5. Starts backend server
+   6. Starts ngrok tunnel
+
+🌍 Access Worldwide:
+   - Local: http://localhost:5000
+   - Remote: Check ngrok URL at http://localhost:4040
+   
+📝 Important:
+   - Keep the window open (backend must run)
+   - Copy ngrok URL for Vercel env variable
+   - Storage: C:\Users\%USERNAME%\MyCloud\Photos
+
+🔗 Links:
+   - Frontend: Your Vercel deployment
+   - GitHub: https://github.com/ranveersingh18w/Personaldrive
+   
+===========================================
